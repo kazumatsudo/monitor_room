@@ -84,7 +84,6 @@ def compensate_humidity(adc_humidity):
 
 
 def compensate_light():
-    bus.write_byte_data(i2c_address_light, 0x80, 0x03)
     return bus.read_word_data(i2c_address_light, 0xAC)
 
 

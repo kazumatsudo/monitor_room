@@ -1,4 +1,4 @@
-def setup_bme280(bus, i2c_address_bme280):
+def setup(bus, i2c_address_bme280):
     osrs_t = 1  # Temperature oversampling x 1
     osrs_p = 1  # Pressure oversampling x 1
     osrs_h = 1  # Humidity oversampling x 1
