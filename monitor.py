@@ -87,49 +87,6 @@ def compensate_light():
     return bus.read_word_data(i2c_address_light, 0xAC)
 
 
-def get_calib_param():
-    calib = []
-
-    for i in range(0x88, 0x88 + 24):
-        calib.append(bus.read_byte_data(i2c_address_except_light, i))
-
-    calib.append(bus.read_byte_data(i2c_address_except_light, 0xA1))
-
-    for i in range(0xE1, 0xE1 + 7):
-        calib.append(bus.read_byte_data(i2c_address_except_light, i))
-
-    digT.append((calib[1] << 8) | calib[0])
-    digT.append((calib[3] << 8) | calib[2])
-    digT.append((calib[5] << 8) | calib[4])
-    digP.append((calib[7] << 8) | calib[6])
-    digP.append((calib[9] << 8) | calib[8])
-    digP.append((calib[11] << 8) | calib[10])
-    digP.append((calib[13] << 8) | calib[12])
-    digP.append((calib[15] << 8) | calib[14])
-    digP.append((calib[17] << 8) | calib[16])
-    digP.append((calib[19] << 8) | calib[18])
-    digP.append((calib[21] << 8) | calib[20])
-    digP.append((calib[23] << 8) | calib[22])
-    digH.append(calib[24])
-    digH.append((calib[26] << 8) | calib[25])
-    digH.append(calib[27])
-    digH.append((calib[28] << 4) | (0x0F & calib[29]))
-    digH.append((calib[30] << 4) | ((calib[29] >> 4) & 0x0F))
-    digH.append(calib[31])
-
-    for i in range(1, 2):
-        if digT[i] & 0x8000:
-            digT[i] = (-digT[i] ^ 0xFFFF) + 1
-
-    for i in range(1, 8):
-        if digP[i] & 0x8000:
-            digP[i] = (-digP[i] ^ 0xFFFF) + 1
-
-    for i in range(0, 6):
-        if digH[i] & 0x8000:
-            digH[i] = (-digH[i] ^ 0xFFFF) + 1
-
-
 def read_data():
     data = []
     for i in range(0xF7, 0xF7 + 8):
