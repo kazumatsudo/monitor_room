@@ -3,15 +3,15 @@
 """
 
 
-def calculate_discomfort(humidity, temperature):
+def calculate_discomfort(h, t):
     """
     不快指数を計算する
 
-    :param humidity: int
+    :param h: int
         湿度 (％)
-    :param temperature: int
+    :param t: int
         温度 (℃)
     :return: int
         不快指数 (％)
     """
-    return 0.81 * temperature + 0.01 * humidity * (0.99 * temperature - 14.3) + 46.3
+    return 0.81 * t + 0.01 * h * (0.99 * t - 14.3) + 46.3

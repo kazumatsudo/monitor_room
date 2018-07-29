@@ -8,10 +8,10 @@ from requests import post
 from time import time
 
 
-def post_data(post_data_dictionary):
+def post_data(data):
     """
     Mackerel へデータを送信する
-    :param post_data_dictionary: object
+    :param data: object
         送信するパラメータ
     :return: string
         送信結果
@@ -22,15 +22,17 @@ def post_data(post_data_dictionary):
     }
 
     payload = [
-        __get_payload_element("custom.temperature.name", post_data_dictionary['temperature']),
-        __get_payload_element("custom.humidity.name", post_data_dictionary['humidity']),
-        __get_payload_element("custom.discomfort.name", post_data_dictionary['discomfort']),
-        __get_payload_element("custom.pressure.name", post_data_dictionary['pressure']),
-        __get_payload_element("custom.light.name", post_data_dictionary['light']),
-        __get_payload_element("custom.ppm.name", post_data_dictionary['ppm'])
+        __get_payload_element("custom.temperature.name", data['temperature']),
+        __get_payload_element("custom.humidity.name", data['humidity']),
+        __get_payload_element("custom.discomfort.name", data['discomfort']),
+        __get_payload_element("custom.pressure.name", data['pressure']),
+        __get_payload_element("custom.light.name", data['light']),
+        __get_payload_element("custom.ppm.name", data['ppm'])
     ]
 
-    return post("https://api.mackerelio.com/api/v0/tsdb", data=dumps(payload), headers=headers).text
+    return post("https://api.mackerelio.com/api/v0/tsdb",
+                data=dumps(payload),
+                headers=headers).text
 
 
 def __get_payload_element(name, value):

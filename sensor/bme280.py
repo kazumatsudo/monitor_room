@@ -7,29 +7,29 @@ class Bme280:
     """
     def __init__(self, bus):
         self.bus = bus
-        self.i2c_address_bme280 = 0x76
-        self.calibration = []
+        self.i2c_address = 0x76
+        self.c = []
         self.data = []
-        self.dig_humidity = []
-        self.dig_pressure = []
-        self.dig_temperature = []
+        self.d_h = []
+        self.d_p = []
+        self.d_t = []
         self.t_fine = 0.0
 
-        oversampling_humidity = 1
-        ctrl_hum_reg = oversampling_humidity
-        bus.write_byte_data(self.i2c_address_bme280, 0xF2, ctrl_hum_reg)
+        o_h = 1
+        ctrl_hum_reg = o_h
+        bus.write_byte_data(self.i2c_address, 0xF2, ctrl_hum_reg)
 
-        oversampling_temperature = 1
-        oversampling_pressure = 1
+        o_t = 1
+        o_p = 1
         mode = 3
-        ctrl_meas_reg = (oversampling_temperature << 5) | (oversampling_pressure << 2) | mode
-        bus.write_byte_data(self.i2c_address_bme280, 0xF4, ctrl_meas_reg)
+        ctrl_meas_reg = (o_t << 5) | (o_p << 2) | mode
+        bus.write_byte_data(self.i2c_address, 0xF4, ctrl_meas_reg)
 
         t_standby = 5
         filter = 0  # Filter off
         spi_3_wire = 0
         config_reg = (t_standby << 5) | (filter << 2) | spi_3_wire
-        bus.write_byte_data(self.i2c_address_bme280, 0xF5, config_reg)
+        bus.write_byte_data(self.i2c_address, 0xF5, config_reg)
 
         self.__calibrate()
 
@@ -41,7 +41,7 @@ class Bme280:
             湿度(％), 大気圧(hPa), 温度(℃)
         """
         for i in range(0xF7, 0xF7 + 8):
-            self.data.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
+            self.data.append(self.bus.read_byte_data(self.i2c_address, i))
 
         return {
             'humidity': self.__compensate_humidity(),
@@ -56,43 +56,43 @@ class Bme280:
         :return: void
         """
         for i in range(0x88, 0x88 + 24):
-            self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
+            self.c.append(self.bus.read_byte_data(self.i2c_address, i))
 
-        self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, 0xA1))
+        self.c.append(self.bus.read_byte_data(self.i2c_address, 0xA1))
 
         for i in range(0xE1, 0xE1 + 7):
-            self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
+            self.c.append(self.bus.read_byte_data(self.i2c_address, i))
 
-        self.dig_temperature.append((self.calibration[1] << 8) | self.calibration[0])
-        self.dig_temperature.append((self.calibration[3] << 8) | self.calibration[2])
-        self.dig_temperature.append((self.calibration[5] << 8) | self.calibration[4])
-        self.dig_pressure.append((self.calibration[7] << 8) | self.calibration[6])
-        self.dig_pressure.append((self.calibration[9] << 8) | self.calibration[8])
-        self.dig_pressure.append((self.calibration[11] << 8) | self.calibration[10])
-        self.dig_pressure.append((self.calibration[13] << 8) | self.calibration[12])
-        self.dig_pressure.append((self.calibration[15] << 8) | self.calibration[14])
-        self.dig_pressure.append((self.calibration[17] << 8) | self.calibration[16])
-        self.dig_pressure.append((self.calibration[19] << 8) | self.calibration[18])
-        self.dig_pressure.append((self.calibration[21] << 8) | self.calibration[20])
-        self.dig_pressure.append((self.calibration[23] << 8) | self.calibration[22])
-        self.dig_humidity.append(self.calibration[24])
-        self.dig_humidity.append((self.calibration[26] << 8) | self.calibration[25])
-        self.dig_humidity.append(self.calibration[27])
-        self.dig_humidity.append((self.calibration[28] << 4) | (0x0F & self.calibration[29]))
-        self.dig_humidity.append((self.calibration[30] << 4) | ((self.calibration[29] >> 4) & 0x0F))
-        self.dig_humidity.append(self.calibration[31])
+        self.d_t.append((self.c[1] << 8) | self.c[0])
+        self.d_t.append((self.c[3] << 8) | self.c[2])
+        self.d_t.append((self.c[5] << 8) | self.c[4])
+        self.d_p.append((self.c[7] << 8) | self.c[6])
+        self.d_p.append((self.c[9] << 8) | self.c[8])
+        self.d_p.append((self.c[11] << 8) | self.c[10])
+        self.d_p.append((self.c[13] << 8) | self.c[12])
+        self.d_p.append((self.c[15] << 8) | self.c[14])
+        self.d_p.append((self.c[17] << 8) | self.c[16])
+        self.d_p.append((self.c[19] << 8) | self.c[18])
+        self.d_p.append((self.c[21] << 8) | self.c[20])
+        self.d_p.append((self.c[23] << 8) | self.c[22])
+        self.d_h.append(self.c[24])
+        self.d_h.append((self.c[26] << 8) | self.c[25])
+        self.d_h.append(self.c[27])
+        self.d_h.append((self.c[28] << 4) | (0x0F & self.c[29]))
+        self.d_h.append((self.c[30] << 4) | ((self.c[29] >> 4) & 0x0F))
+        self.d_h.append(self.c[31])
 
         for i in range(1, 2):
-            if self.dig_temperature[i] & 0x8000:
-                self.dig_temperature[i] = (-self.dig_temperature[i] ^ 0xFFFF) + 1
+            if self.d_t[i] & 0x8000:
+                self.d_t[i] = (-self.d_t[i] ^ 0xFFFF) + 1
 
         for i in range(1, 8):
-            if self.dig_pressure[i] & 0x8000:
-                self.dig_pressure[i] = (-self.dig_pressure[i] ^ 0xFFFF) + 1
+            if self.d_p[i] & 0x8000:
+                self.d_p[i] = (-self.d_p[i] ^ 0xFFFF) + 1
 
         for i in range(0, 6):
-            if self.dig_humidity[i] & 0x8000:
-                self.dig_humidity[i] = (-self.dig_humidity[i] ^ 0xFFFF) + 1
+            if self.d_h[i] & 0x8000:
+                self.d_h[i] = (-self.d_h[i] ^ 0xFFFF) + 1
 
     def __compensate_humidity(self):
         """
@@ -104,14 +104,17 @@ class Bme280:
         var_h = self.t_fine - 76800.0
 
         if var_h != 0:
-            row_humidity = (self.data[6] << 8) | self.data[7]
-            var_h = (row_humidity - (self.dig_humidity[3] * 64.0 + self.dig_humidity[4] / 16384.0 * var_h)) * (
-                    self.dig_humidity[1] / 65536.0 * (1.0 + self.dig_humidity[5] / 67108864.0 * var_h *
-                                                      (1.0 + self.dig_humidity[2] / 67108864.0 * var_h)))
+            r_h = (self.data[6] << 8) | self.data[7]
+            var_h = (r_h - (self.d_h[3] * 64.0 + self.d_h[4] /
+                            16384.0 * var_h)) * (
+                    self.d_h[1] /
+                    65536.0 * (1.0 + self.d_h[5] /
+                               67108864.0 * var_h * (1.0 + self.d_h[2] /
+                                                     67108864.0 * var_h)))
         else:
             return 0
 
-        var_h = var_h * (1.0 - self.dig_humidity[0] * var_h / 524288.0)
+        var_h = var_h * (1.0 - self.d_h[0] * var_h / 524288.0)
         if var_h > 100.0:
             var_h = 100.0
         elif var_h < 0.0:
@@ -127,26 +130,26 @@ class Bme280:
             大気圧(hPa)
         """
         v1 = (self.t_fine / 2.0) - 64000.0
-        v2 = (((v1 / 4.0) * (v1 / 4.0)) / 2048) * self.dig_pressure[5]
-        v2 = v2 + ((v1 * self.dig_pressure[4]) * 2.0)
-        v2 = (v2 / 4.0) + (self.dig_pressure[3] * 65536.0)
-        v1 = (((self.dig_pressure[2] * (((v1 / 4.0) * (v1 / 4.0)) / 8192)) / 8) + ((self.dig_pressure[1] * v1) / 2.0)
-              ) / 262144
-        v1 = ((32768 + v1) * self.dig_pressure[0]) / 32768
+        v2 = pow((v1 / 4.0), 2) * self.d_p[5] / 2048
+        v2 = v2 + ((v1 * self.d_p[4]) * 2.0)
+        v2 = (v2 / 4.0) + (self.d_p[3] * 65536.0)
+        v1 = ((self.d_p[2] * pow((v1 / 4.0), 2) / (8192 * 8)) +
+              ((self.d_p[1] * v1) / 2.0)) / 262144
+        v1 = ((32768 + v1) * self.d_p[0]) / 32768
 
         if v1 == 0:
             return 0
 
-        row_pressure = (self.data[0] << 12) | (self.data[1] << 4) | (self.data[2] >> 4)
-        pressure = ((1048576 - row_pressure) - (v2 / 4096)) * 3125
+        r_p = (self.data[0] << 12) | (self.data[1] << 4) | (self.data[2] >> 4)
+        pressure = ((1048576 - r_p) - (v2 / 4096)) * 3125
         if pressure < 0x80000000:
             pressure = (pressure * 2.0) / v1
         else:
             pressure = (pressure / v1) * 2
 
-        v1 = (self.dig_pressure[8] * (((pressure / 8.0) * (pressure / 8.0)) / 8192.0)) / 4096
-        v2 = ((pressure / 4.0) * self.dig_pressure[7]) / 8192.0
-        pressure = pressure + ((v1 + v2 + self.dig_pressure[6]) / 16.0)
+        v1 = self.d_p[8] * pow(pressure / 8.0, 2) / (8192.0 * 4096)
+        v2 = pressure * self.d_p[7] / (8192.0 * 4.0)
+        pressure = pressure + ((v1 + v2 + self.d_p[6]) / 16.0)
 
         return pressure / 100
 
@@ -157,12 +160,10 @@ class Bme280:
         :return: float
             温度(℃)
         """
-        row_temperature = (self.data[3] << 12) | (self.data[4] << 4) | (self.data[5] >> 4)
+        r_t = (self.data[3] << 12) | (self.data[4] << 4) | (self.data[5] >> 4)
 
-        v1 = (row_temperature / 16384.0 - self.dig_temperature[0] / 1024.0) * self.dig_temperature[1]
-        v2 = (row_temperature / 131072.0 - self.dig_temperature[0] / 8192.0) * (row_temperature / 131072.0 -
-                                                                                self.dig_temperature[0] / 8192.0
-                                                                                ) * self.dig_temperature[2]
+        v1 = (r_t / 16384.0 - self.d_t[0] / 1024.0) * self.d_t[1]
+        v2 = pow((r_t / 131072.0 - self.d_t[0] / 8192.0), 2) * self.d_t[2]
 
         self.t_fine = v1 + v2
         temperature = self.t_fine / 5120.0
