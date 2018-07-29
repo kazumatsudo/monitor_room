@@ -45,10 +45,11 @@ class Bme280(object):
         for i in range(0xF7, 0xF7 + 8):
             self.data.append(self.bus.read_byte_data(self.i2c_address, i))
 
+        # temperature で算出した t_fine を他で使い回すため、先に呼び出す必要がある
         return {
-            'humidity': self.__compensate_humidity(),
+            'temperature': self.__compensate_temperature(),
             'pressure': self.__compensate_pressure(),
-            'temperature': self.__compensate_temperature()
+            'humidity': self.__compensate_humidity()
         }
 
     def __calibrate(self):
