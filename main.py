@@ -1,17 +1,25 @@
+from smbus2 import SMBus
+
 from sensor.bme280 import Bme280
 from sensor.mh_z19 import MhZ19
 from sensor.tsl2561 import Tsl2561
 from util.mackerel import post_data
-from util.util import calculate_discomfort, get_bus
+from util.util import calculate_discomfort
 
 
 class Main:
-    def __init__(self):
-        self.bus = get_bus()
-
-        self.bme280 = Bme280(self.bus)
+    """
+    メインクラス
+    各センサーから取得したデータを監視サーバーに送信する
+    """
+    def __init__(self, bus):
+        """
+        :param bus: object
+            I2C通信のコネクションオブジェクト
+        """
+        self.bme280 = Bme280(bus)
         self.mz_z19 = MhZ19()
-        self.tsl2561 = Tsl2561(self.bus)
+        self.tsl2561 = Tsl2561(bus)
 
     def exec(self):
         post_data(self.__get_parameter())
@@ -29,5 +37,5 @@ class Main:
 
 
 if __name__ == '__main__':
-    main = Main()
+    main = Main(SMBus(1))
     main.exec()

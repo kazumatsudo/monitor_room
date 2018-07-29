@@ -1,9 +1,7 @@
-from util.constants import I2C_ADDRESS_BME280
-
-
 class Bme280:
     def __init__(self, bus):
         self.bus = bus
+        self.i2c_address_bme280 = 0x76
         self.calibration = []
         self.data = []
         self.dig_humidity = []
@@ -13,25 +11,25 @@ class Bme280:
 
         oversampling_humidity = 1
         ctrl_hum_reg = oversampling_humidity
-        bus.write_byte_data(I2C_ADDRESS_BME280, 0xF2, ctrl_hum_reg)
+        bus.write_byte_data(self.i2c_address_bme280, 0xF2, ctrl_hum_reg)
 
         oversampling_temperature = 1
         oversampling_pressure = 1
         mode = 3
         ctrl_meas_reg = (oversampling_temperature << 5) | (oversampling_pressure << 2) | mode
-        bus.write_byte_data(I2C_ADDRESS_BME280, 0xF4, ctrl_meas_reg)
+        bus.write_byte_data(self.i2c_address_bme280, 0xF4, ctrl_meas_reg)
 
         t_standby = 5
         filter = 0  # Filter off
         spi_3_wire = 0
         config_reg = (t_standby << 5) | (filter << 2) | spi_3_wire
-        bus.write_byte_data(I2C_ADDRESS_BME280, 0xF5, config_reg)
+        bus.write_byte_data(self.i2c_address_bme280, 0xF5, config_reg)
 
         self.__get_calibration_parameter()
 
     def read_data(self):
         for i in range(0xF7, 0xF7 + 8):
-            self.data.append(self.bus.read_byte_data(I2C_ADDRESS_BME280, i))
+            self.data.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
 
         return {
             'humidity': self.__compensate_humidity(),
@@ -41,12 +39,12 @@ class Bme280:
 
     def __get_calibration_parameter(self):
         for i in range(0x88, 0x88 + 24):
-            self.calibration.append(self.bus.read_byte_data(I2C_ADDRESS_BME280, i))
+            self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
 
-        self.calibration.append(self.bus.read_byte_data(I2C_ADDRESS_BME280, 0xA1))
+        self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, 0xA1))
 
         for i in range(0xE1, 0xE1 + 7):
-            self.calibration.append(self.bus.read_byte_data(I2C_ADDRESS_BME280, i))
+            self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
 
         self.dig_temperature.append((self.calibration[1] << 8) | self.calibration[0])
         self.dig_temperature.append((self.calibration[3] << 8) | self.calibration[2])
