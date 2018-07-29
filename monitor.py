@@ -219,10 +219,3 @@ def post_data(temprature, humidity, discomfort, pressure, light, ppm):
     ]
 
     print(requests.post("https://api.mackerelio.com/api/v0/tsdb", data=json.dumps(payload), headers=headers).text)
-
-
-setup()
-get_calib_param()
-
-temperature, humidity, discomfort, pressure, light, ppm = read_data()
-post_data(temperature, humidity, discomfort, pressure, light, ppm)
