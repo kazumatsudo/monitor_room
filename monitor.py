@@ -1,36 +1,10 @@
 # coding: utf-8
 
-from smbus2 import SMBus
-import serial
 import time
 
 import requests
 import json
 
-bus_number = 1
-i2c_address_except_light = 0x76
-i2c_address_light = 0x39
-
-bus = SMBus(bus_number)
-
-digT = []
-digP = []
-digH = []
-
-t_fine = 0.0
-
-
-def measure_ppm():
-    ser = serial.Serial('/dev/ttyS0',
-                        baudrate=9600,
-                        bytesize=serial.EIGHTBITS,
-                        parity=serial.PARITY_NONE,
-                        stopbits=serial.STOPBITS_ONE,
-                        timeout=1.0)
-    ser.write(b"\xff\x01\x86\x00\x00\x00\x00\x00\x79")
-    str = ser.read(9)
-
-    return str[2] * 256 + str[3]
 
 
 hostId = "3iFS5Ee4ueo"
