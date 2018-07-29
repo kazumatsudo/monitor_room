@@ -1,16 +1,13 @@
-from smbus2 import SMBus
-
 from sensor.bme280 import read_data as read_data_from_bme280, setup as setup_bme280, get_calibration_parameter
 from sensor.mh_z19 import MhZ19
 from sensor.tsl2561 import Tsl2561
-from util.constants import BUS_NUMBER
 from util.mackerel import post_data
-from util.util import calculate_discomfort
+from util.util import calculate_discomfort, get_bus
 
 
 class Main:
     def __init__(self):
-        self.bus = SMBus(BUS_NUMBER)
+        self.bus = get_bus()
         self.mz_z19 = MhZ19()
         self.tsl2561 = Tsl2561(self.bus)
 
