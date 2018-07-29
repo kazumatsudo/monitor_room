@@ -32,9 +32,6 @@ def measure_ppm():
 
     return str[2] * 256 + str[3]
 
-def compensate_light():
-    return bus.read_word_data(i2c_address_light, 0xAC)
-
 
 hostId = "3iFS5Ee4ueo"
 
