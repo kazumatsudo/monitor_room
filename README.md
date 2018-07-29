@@ -6,7 +6,7 @@ Measure environmental values and record them on the monitoring server
 
 - Python 3
 - Raspberry Pi 3
-- sensors
+- Sensors
     - BME280 (humidity, pressure, temperature)
     - MH-Z19 (co2)
     - TSL2561 (light)
@@ -21,18 +21,26 @@ Measure environmental values and record them on the monitoring server
 
 ## Instration
 
-1. git clone
+1. Git clone
     ```
     $ git clone xxx
     ```
 
-1. set environment variable
+1. Set environment variable
     ```
     $ export MONITOR_ROOM_MACKEREL_X_API_KEY="YOUR_MACKEREL_X_API_KEY"
     $ export MONITOR_ROOM_MACKEREL_HOST_ID="YOUR_MACKEREL_HOST_ID"
     ```
 
-1. make mackerel account
+1. Make mackerel account
+
+## Before commit
+
+1. Exec lint
+    ```
+    $ flake8 main.py ./maintenance/ ./sensor/ ./util/
+    $ pylint main.py ./maintenance/ ./sensor/ ./util/
+    ```
 
 ## Author
 
