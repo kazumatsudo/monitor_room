@@ -1,4 +1,10 @@
 class Bme280:
+    """
+    BME280 - 温湿度・気圧センサモジュールキット
+    http://akizukidenshi.com/catalog/g/gK-09421/
+
+    上記センサーの値を取得するクラス
+    """
     def __init__(self, bus):
         self.bus = bus
         self.i2c_address_bme280 = 0x76
@@ -25,9 +31,15 @@ class Bme280:
         config_reg = (t_standby << 5) | (filter << 2) | spi_3_wire
         bus.write_byte_data(self.i2c_address_bme280, 0xF5, config_reg)
 
-        self.__get_calibration_parameter()
+        self.__calibrate()
 
     def read_data(self):
+        """
+        センサーから取得した値を返す
+
+        :return: object
+            湿度(％), 大気圧(hPa), 温度(℃)
+        """
         for i in range(0xF7, 0xF7 + 8):
             self.data.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
 
@@ -37,7 +49,12 @@ class Bme280:
             'temperature': self.__compensate_temperature()
         }
 
-    def __get_calibration_parameter(self):
+    def __calibrate(self):
+        """
+        キャリブレーションを行う
+
+        :return: void
+        """
         for i in range(0x88, 0x88 + 24):
             self.calibration.append(self.bus.read_byte_data(self.i2c_address_bme280, i))
 
@@ -77,7 +94,38 @@ class Bme280:
             if self.dig_humidity[i] & 0x8000:
                 self.dig_humidity[i] = (-self.dig_humidity[i] ^ 0xFFFF) + 1
 
+    def __compensate_humidity(self):
+        """
+        センサーから値を取得する
+
+        :return: float
+            湿度(％)
+        """
+        var_h = self.t_fine - 76800.0
+
+        if var_h != 0:
+            row_humidity = (self.data[6] << 8) | self.data[7]
+            var_h = (row_humidity - (self.dig_humidity[3] * 64.0 + self.dig_humidity[4] / 16384.0 * var_h)) * (
+                    self.dig_humidity[1] / 65536.0 * (1.0 + self.dig_humidity[5] / 67108864.0 * var_h *
+                                                      (1.0 + self.dig_humidity[2] / 67108864.0 * var_h)))
+        else:
+            return 0
+
+        var_h = var_h * (1.0 - self.dig_humidity[0] * var_h / 524288.0)
+        if var_h > 100.0:
+            var_h = 100.0
+        elif var_h < 0.0:
+            var_h = 0.0
+
+        return var_h
+
     def __compensate_pressure(self):
+        """
+        センサーから値を取得する
+
+        :return: float
+            大気圧(hPa)
+        """
         v1 = (self.t_fine / 2.0) - 64000.0
         v2 = (((v1 / 4.0) * (v1 / 4.0)) / 2048) * self.dig_pressure[5]
         v2 = v2 + ((v1 * self.dig_pressure[4]) * 2.0)
@@ -103,6 +151,12 @@ class Bme280:
         return pressure / 100
 
     def __compensate_temperature(self):
+        """
+        センサーから値を取得する
+
+        :return: float
+            温度(℃)
+        """
         row_temperature = (self.data[3] << 12) | (self.data[4] << 4) | (self.data[5] >> 4)
 
         v1 = (row_temperature / 16384.0 - self.dig_temperature[0] / 1024.0) * self.dig_temperature[1]
@@ -114,22 +168,3 @@ class Bme280:
         temperature = self.t_fine / 5120.0
 
         return temperature
-
-    def __compensate_humidity(self):
-        var_h = self.t_fine - 76800.0
-
-        if var_h != 0:
-            row_humidity = (self.data[6] << 8) | self.data[7]
-            var_h = (row_humidity - (self.dig_humidity[3] * 64.0 + self.dig_humidity[4] / 16384.0 * var_h)) * (
-                    self.dig_humidity[1] / 65536.0 * (1.0 + self.dig_humidity[5] / 67108864.0 * var_h *
-                                                      (1.0 + self.dig_humidity[2] / 67108864.0 * var_h)))
-        else:
-            return 0
-
-        var_h = var_h * (1.0 - self.dig_humidity[0] * var_h / 524288.0)
-        if var_h > 100.0:
-            var_h = 100.0
-        elif var_h < 0.0:
-            var_h = 0.0
-
-        return var_h
