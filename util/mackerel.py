@@ -4,52 +4,27 @@ from time import time
 
 
 def post_data(post_data_dictionary):
-    host_id = "3iFS5Ee4ueo"
-    x_api_key = "jrknLvRqfcmn8JQ8LjVNWRgp8a3hRjVEo34rMx7Hs7Sr"
-    now = int(time())
-
     headers = {
         "Content-Type": "application/json",
-        "X-Api-Key": x_api_key
+        "X-Api-Key": "jrknLvRqfcmn8JQ8LjVNWRgp8a3hRjVEo34rMx7Hs7Sr"
     }
 
     payload = [
-        {
-            "hostId": host_id,
-            "name": "custom.temperature.name",
-            "time": now,
-            "value": post_data_dictionary['temperature']
-        },
-        {
-            "hostId": host_id,
-            "name": "custom.humidity.name",
-            "time": now,
-            "value": post_data_dictionary['humidity']
-        },
-        {
-            "hostId": host_id,
-            "name": "custom.discomfort.name",
-            "time": now,
-            "value": post_data_dictionary['discomfort']
-        },
-        {
-            "hostId": host_id,
-            "name": "custom.pressure.name",
-            "time": now,
-            "value": post_data_dictionary['pressure']
-        },
-        {
-            "hostId": host_id,
-            "name": "custom.light.name",
-            "time": now,
-            "value": post_data_dictionary['light']
-        },
-        {
-            "hostId": host_id,
-            "name": "custom.ppm.name",
-            "time": now,
-            "value": post_data_dictionary['ppm']
-        },
+        __get_payload_element("custom.temperature.name", post_data_dictionary['temperature']),
+        __get_payload_element("custom.humidity.name", post_data_dictionary['humidity']),
+        __get_payload_element("custom.discomfort.name", post_data_dictionary['discomfort']),
+        __get_payload_element("custom.pressure.name", post_data_dictionary['pressure']),
+        __get_payload_element("custom.light.name", post_data_dictionary['light']),
+        __get_payload_element("custom.ppm.name", post_data_dictionary['ppm'])
     ]
 
     post("https://api.mackerelio.com/api/v0/tsdb", data=dumps(payload), headers=headers)
+
+
+def __get_payload_element(name, value):
+    return {
+        "hostId": "3iFS5Ee4ueo",
+        "name": name,
+        "time": int(time()),
+        "value": value
+    }
