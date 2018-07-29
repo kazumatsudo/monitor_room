@@ -1,3 +1,4 @@
+"""メインモジュール"""
 from smbus2 import SMBus
 
 from sensor.bme280 import Bme280
@@ -42,5 +43,4 @@ class Main(object):
 
 
 if __name__ == '__main__':
-    main = Main(SMBus(1))
-    main.exec()
+    Main(SMBus(1)).exec()

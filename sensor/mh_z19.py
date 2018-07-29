@@ -1,7 +1,9 @@
-from serial import EIGHTBITS
-from serial import PARITY_NONE
-from serial import Serial
-from serial import STOPBITS_ONE
+"""MH-Z19 - CO2二酸化炭素センサーモジュール"""
+
+from serial import EIGHTBITS  # pylint: disable=no-name-in-module
+from serial import PARITY_NONE  # pylint: disable=no-name-in-module
+from serial import Serial  # pylint: disable=no-name-in-module
+from serial import STOPBITS_ONE  # pylint: disable=no-name-in-module
 
 
 class MhZ19(object):

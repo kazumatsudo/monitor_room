@@ -5,7 +5,7 @@ https://mackerel.io/ja/
 
 from json import dumps
 from requests import post
-from time import time
+from time import time  # pylint: disable=wrong-import-order
 
 
 def post_data(data):
