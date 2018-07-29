@@ -3,9 +3,9 @@ from requests import post
 from smbus2 import SMBus
 from time import time
 
-from bme280 import read_data as read_data_from_bme280, setup as setup_bme280, get_calibration_parameter
-from mh_z19 import read_data as read_data_from_mh_z19
-from tsl2561 import read_data as read_data_from_tsl2561, setup as setup_tsl2561
+from sensor.bme280 import read_data as read_data_from_bme280, setup as setup_bme280, get_calibration_parameter
+from sensor.mh_z19 import read_data as read_data_from_mh_z19
+from sensor.tsl2561 import read_data as read_data_from_tsl2561, setup as setup_tsl2561
 
 
 def main():
