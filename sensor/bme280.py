@@ -1,6 +1,6 @@
-class Bme280:
-    """
-    BME280 - 温湿度・気圧センサモジュールキット
+class Bme280(object):
+    """BME280 - 温湿度・気圧センサモジュールキット
+
     http://akizukidenshi.com/catalog/g/gK-09421/
 
     上記センサーの値を取得するクラス
@@ -34,8 +34,7 @@ class Bme280:
         self.__calibrate()
 
     def read_data(self):
-        """
-        センサーから取得した値を返す
+        """センサーから取得した値を返す
 
         :return: object
             湿度(％), 大気圧(hPa), 温度(℃)
@@ -50,8 +49,7 @@ class Bme280:
         }
 
     def __calibrate(self):
-        """
-        キャリブレーションを行う
+        """キャリブレーションを行う
 
         :return: void
         """
@@ -95,8 +93,7 @@ class Bme280:
                 self.d_h[i] = (-self.d_h[i] ^ 0xFFFF) + 1
 
     def __compensate_humidity(self):
-        """
-        センサーから値を取得する
+        """センサーから値を取得する
 
         :return: float
             湿度(％)
@@ -123,8 +120,7 @@ class Bme280:
         return var_h
 
     def __compensate_pressure(self):
-        """
-        センサーから値を取得する
+        """センサーから値を取得する
 
         :return: float
             大気圧(hPa)
@@ -154,8 +150,7 @@ class Bme280:
         return pressure / 100
 
     def __compensate_temperature(self):
-        """
-        センサーから値を取得する
+        """センサーから値を取得する
 
         :return: float
             温度(℃)

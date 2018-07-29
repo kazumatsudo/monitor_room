@@ -1,9 +1,12 @@
-from serial import Serial, EIGHTBITS, PARITY_NONE, STOPBITS_ONE
+from serial import EIGHTBITS
+from serial import PARITY_NONE
+from serial import Serial
+from serial import STOPBITS_ONE
 
 
-class MhZ19:
-    """
-    MH-Z19 - CO2二酸化炭素センサーモジュール
+class MhZ19(object):
+    """MH-Z19 - CO2二酸化炭素センサーモジュール
+
     https://www.amazon.co.jp/dp/B01MZI8O5E
 
     上記センサーの値を取得するクラス
@@ -18,8 +21,7 @@ class MhZ19:
         self.serial.write(b"\xff\x01\x86\x00\x00\x00\x00\x00\x79")
 
     def read_data(self):
-        """
-        センサーから取得した値を返す
+        """センサーから取得した値を返す
 
         :return: float
             二酸化炭素濃度(ppm)

@@ -4,8 +4,7 @@
 
 
 def calculate_discomfort(h, t):
-    """
-    不快指数を計算する
+    """不快指数を計算する
 
     :param h: int
         湿度 (％)

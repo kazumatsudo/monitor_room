@@ -7,24 +7,29 @@ from util.mackerel import post_data
 from util.util import calculate_discomfort as discomfort
 
 
-class Main:
-    """
-    メインクラス
+class Main(object):
+    """メインクラス
+
     各センサーから取得したデータを監視サーバーに送信する
     """
     def __init__(self, bus):
-        """
-        :param bus: object
-            I2C通信のコネクションオブジェクト
-        """
         self.bme280 = Bme280(bus)
         self.mz_z19 = MhZ19()
         self.tsl2561 = Tsl2561(bus)
 
     def exec(self):
+        """実行関数
+
+        :return: void
+        """
         print(post_data(self.__get_parameter()))
 
     def __get_parameter(self):
+        """各センサから値を取得する
+
+        :return: object
+            不快指数(％), 湿度(％), 照度(lux), 二酸化炭素濃度(ppm), 大気圧(hPa), 温度(℃)
+        """
         data = self.bme280.read_data()
         return {
             'discomfort': discomfort(data['humidity'], data['temperature']),

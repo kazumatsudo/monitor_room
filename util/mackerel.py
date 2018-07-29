@@ -9,8 +9,8 @@ from time import time
 
 
 def post_data(data):
-    """
-    Mackerel へデータを送信する
+    """Mackerel へデータを送信する
+
     :param data: object
         送信するパラメータ
     :return: string
@@ -36,8 +36,8 @@ def post_data(data):
 
 
 def __get_payload_element(name, value):
-    """
-    Mackerel への送信用パラメータの要素を返す
+    """Mackerel への送信用パラメータの要素を返す
+
     :param name: string
         Mackerel での表示名
     :param value: float
