@@ -1,9 +1,21 @@
+"""
+監視サーバー Mackerel へデータを送信する
+https://mackerel.io/ja/
+"""
+
 from json import dumps
 from requests import post
 from time import time
 
 
 def post_data(post_data_dictionary):
+    """
+    Mackerel へデータを送信する
+    :param post_data_dictionary: object
+        送信するパラメータ
+    :return: string
+        送信結果
+    """
     headers = {
         "Content-Type": "application/json",
         "X-Api-Key": "jrknLvRqfcmn8JQ8LjVNWRgp8a3hRjVEo34rMx7Hs7Sr"
@@ -18,10 +30,19 @@ def post_data(post_data_dictionary):
         __get_payload_element("custom.ppm.name", post_data_dictionary['ppm'])
     ]
 
-    post("https://api.mackerelio.com/api/v0/tsdb", data=dumps(payload), headers=headers)
+    return post("https://api.mackerelio.com/api/v0/tsdb", data=dumps(payload), headers=headers).text
 
 
 def __get_payload_element(name, value):
+    """
+    Mackerel への送信用パラメータの要素を返す
+    :param name: string
+        Mackerel での表示名
+    :param value: float
+        センサーが取得した値
+    :return: object
+        Mackerel への送信用パラメータの要素
+    """
     return {
         "hostId": "3iFS5Ee4ueo",
         "name": name,
