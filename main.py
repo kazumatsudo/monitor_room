@@ -21,18 +21,13 @@ def setup(bus):
 
 
 def get_parameter(bus):
-    calibration_parameter = get_calibration_parameter(bus)
-
-    data_bme280 = read_data_from_bme280(bus, calibration_parameter)
-    discomfort = calculate_discomfort(data_bme280['humidity'], data_bme280['temperature'])
-    light = read_data_from_tsl2561(bus)
-    ppm = read_data_from_mh_z19()
+    data_bme280 = read_data_from_bme280(bus, get_calibration_parameter(bus))
 
     return {
-        'discomfort': discomfort,
+        'discomfort': calculate_discomfort(data_bme280['humidity'], data_bme280['temperature']),
         'humidity': data_bme280['humidity'],
-        'light': light,
-        'ppm': ppm,
+        'light': read_data_from_tsl2561(bus),
+        'ppm': read_data_from_mh_z19(),
         'pressure': data_bme280['pressure'],
         'temperature': data_bme280['temperature']
     }
