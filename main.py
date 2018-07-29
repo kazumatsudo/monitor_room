@@ -8,30 +8,32 @@ from util.mackerel import post_data
 from util.util import calculate_discomfort
 
 
-def main():
-    bus = SMBus(BUS_NUMBER)
-    setup(bus)
-    post_data_dictionary = get_parameter(bus)
-    post_data(post_data_dictionary)
+class Main:
+    def __init__(self):
+        self.bus = SMBus(BUS_NUMBER)
 
+    def exec(self):
+        self.__setup()
+        post_data_dictionary = self.__get_parameter()
+        post_data(post_data_dictionary)
 
-def setup(bus):
-    setup_bme280(bus)
-    setup_tsl2561(bus)
+    def __setup(self):
+        setup_bme280(self.bus)
+        setup_tsl2561(self.bus)
 
+    def __get_parameter(self):
+        data_bme280 = read_data_from_bme280(self.bus, get_calibration_parameter(self.bus))
 
-def get_parameter(bus):
-    data_bme280 = read_data_from_bme280(bus, get_calibration_parameter(bus))
-
-    return {
-        'discomfort': calculate_discomfort(data_bme280['humidity'], data_bme280['temperature']),
-        'humidity': data_bme280['humidity'],
-        'light': read_data_from_tsl2561(bus),
-        'ppm': read_data_from_mh_z19(),
-        'pressure': data_bme280['pressure'],
-        'temperature': data_bme280['temperature']
-    }
+        return {
+            'discomfort': calculate_discomfort(data_bme280['humidity'], data_bme280['temperature']),
+            'humidity': data_bme280['humidity'],
+            'light': read_data_from_tsl2561(self.bus),
+            'ppm': read_data_from_mh_z19(),
+            'pressure': data_bme280['pressure'],
+            'temperature': data_bme280['temperature']
+        }
 
 
 if __name__ == '__main__':
-    main()
+    main = Main()
+    main.exec()
