@@ -1,34 +1,37 @@
-def setup(bus, i2c_address_bme280):
+from util.constants import I2C_ADDRESS_BME280
+
+
+def setup(bus):
     oversampling_humidity = 1
     ctrl_hum_reg = oversampling_humidity
-    bus.write_byte_data(i2c_address_bme280, 0xF2, ctrl_hum_reg)
+    bus.write_byte_data(I2C_ADDRESS_BME280, 0xF2, ctrl_hum_reg)
 
     oversampling_temperature = 1
     oversampling_pressure = 1
     mode = 3
     ctrl_meas_reg = (oversampling_temperature << 5) | (oversampling_pressure << 2) | mode
-    bus.write_byte_data(i2c_address_bme280, 0xF4, ctrl_meas_reg)
+    bus.write_byte_data(I2C_ADDRESS_BME280, 0xF4, ctrl_meas_reg)
 
     t_standby = 5
     filter = 0  # Filter off
     spi_3_wire = 0
     config_reg = (t_standby << 5) | (filter << 2) | spi_3_wire
-    bus.write_byte_data(i2c_address_bme280, 0xF5, config_reg)
+    bus.write_byte_data(I2C_ADDRESS_BME280, 0xF5, config_reg)
 
 
-def get_calibration_parameter(bus, i2c_address_bme280):
+def get_calibration_parameter(bus):
     dig_humidity = []
     dig_pressure = []
     dig_temperature = []
     calibration = []
 
     for i in range(0x88, 0x88 + 24):
-        calibration.append(bus.read_byte_data(i2c_address_bme280, i))
+        calibration.append(bus.read_byte_data(I2C_ADDRESS_BME280, i))
 
-    calibration.append(bus.read_byte_data(i2c_address_bme280, 0xA1))
+    calibration.append(bus.read_byte_data(I2C_ADDRESS_BME280, 0xA1))
 
     for i in range(0xE1, 0xE1 + 7):
-        calibration.append(bus.read_byte_data(i2c_address_bme280, i))
+        calibration.append(bus.read_byte_data(I2C_ADDRESS_BME280, i))
 
     dig_temperature.append((calibration[1] << 8) | calibration[0])
     dig_temperature.append((calibration[3] << 8) | calibration[2])
@@ -118,10 +121,10 @@ def compensate_humidity(row_humidity, dig_humidity, t_fine_temperature):
     return var_h
 
 
-def read_data(bus, i2c_address_bme280, dig_humidity, dig_pressure, dig_temperature):
+def read_data(bus, dig_humidity, dig_pressure, dig_temperature):
     data = []
     for i in range(0xF7, 0xF7 + 8):
-        data.append(bus.read_byte_data(i2c_address_bme280, i))
+        data.append(bus.read_byte_data(I2C_ADDRESS_BME280, i))
 
     raw_pressure = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
     raw_temperature = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
