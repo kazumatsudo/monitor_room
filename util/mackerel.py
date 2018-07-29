@@ -4,6 +4,7 @@ https://mackerel.io/ja/
 """
 
 from json import dumps
+from os import environ
 from requests import post
 from time import time  # pylint: disable=wrong-import-order
 
@@ -18,7 +19,7 @@ def post_data(data):
     """
     headers = {
         "Content-Type": "application/json",
-        "X-Api-Key": "jrknLvRqfcmn8JQ8LjVNWRgp8a3hRjVEo34rMx7Hs7Sr"
+        "X-Api-Key": environ["MONITOR_ROOM_MACKEREL_X_API_KEY"]
     }
 
     payload = [
@@ -46,7 +47,7 @@ def __get_payload_element(name, value):
         Mackerel への送信用パラメータの要素
     """
     return {
-        "hostId": "3iFS5Ee4ueo",
+        "hostId": environ["MONITOR_ROOM_MACKEREL_HOST_ID"],
         "name": name,
         "time": int(time()),
         "value": value
