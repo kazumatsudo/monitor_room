@@ -64,7 +64,11 @@ def get_calibration_parameter(bus):
         if dig_humidity[i] & 0x8000:
             dig_humidity[i] = (-dig_humidity[i] ^ 0xFFFF) + 1
 
-    return dig_humidity, dig_pressure, dig_temperature
+    return {
+        "dig_humidity": dig_humidity,
+        "dig_pressure": dig_pressure,
+        "dig_temperature": dig_temperature
+    }
 
 
 def compensate_pressure(row_pressure, dig_pressure):
@@ -95,7 +99,8 @@ def compensate_pressure(row_pressure, dig_pressure):
 
 def compensate_temperature(raw_temperature, dig_temperature):
     v1 = (raw_temperature / 16384.0 - dig_temperature[0] / 1024.0) * dig_temperature[1]
-    v2 = (raw_temperature / 131072.0 - dig_temperature[0] / 8192.0) * (raw_temperature / 131072.0 - dig_temperature[0] / 8192.0) * dig_temperature[2]
+    v2 = (raw_temperature / 131072.0 - dig_temperature[0] / 8192.0) * (raw_temperature / 131072.0 - dig_temperature[0] /
+                                                                       8192.0) * dig_temperature[2]
 
     t_fine_temperature = v1 + v2
     temperature = t_fine_temperature / 5120.0
@@ -108,7 +113,8 @@ def compensate_humidity(row_humidity, dig_humidity, t_fine_temperature):
 
     if var_h != 0:
         var_h = (row_humidity - (dig_humidity[3] * 64.0 + dig_humidity[4] / 16384.0 * var_h)) * (
-                dig_humidity[1] / 65536.0 * (1.0 + dig_humidity[5] / 67108864.0 * var_h * (1.0 + dig_humidity[2] / 67108864.0 * var_h)))
+                dig_humidity[1] / 65536.0 * (1.0 + dig_humidity[5] / 67108864.0 * var_h * (1.0 + dig_humidity[2] /
+                                                                                           67108864.0 * var_h)))
     else:
         return 0
 
@@ -121,17 +127,22 @@ def compensate_humidity(row_humidity, dig_humidity, t_fine_temperature):
     return var_h
 
 
-def read_data(bus, dig_humidity, dig_pressure, dig_temperature):
+def read_data(bus, calibration_parameter):
     data = []
     for i in range(0xF7, 0xF7 + 8):
         data.append(bus.read_byte_data(I2C_ADDRESS_BME280, i))
 
     raw_pressure = (data[0] << 12) | (data[1] << 4) | (data[2] >> 4)
+    pressure = compensate_pressure(raw_pressure, calibration_parameter['dig_pressure'])
+
     raw_temperature = (data[3] << 12) | (data[4] << 4) | (data[5] >> 4)
+    temperature, t_fine_temperature = compensate_temperature(raw_temperature, calibration_parameter['dig_temperature'])
+
     raw_humidity = (data[6] << 8) | data[7]
+    humidity = compensate_humidity(raw_humidity, calibration_parameter['dig_humidity'], t_fine_temperature)
 
-    pressure = compensate_pressure(raw_pressure, dig_pressure)
-    temperature, t_fine_temperature = compensate_temperature(raw_temperature, dig_temperature)
-    humidity = compensate_humidity(raw_humidity, dig_humidity, t_fine_temperature)
-
-    return pressure, temperature, humidity
+    return {
+        'humidity': humidity,
+        'pressure': pressure,
+        'temperature': temperature
+    }

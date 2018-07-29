@@ -11,9 +11,9 @@ from util.constants import BUS_NUMBER
 
 def main():
     bus = SMBus(BUS_NUMBER)
-
     setup(bus)
-    post_data(get_parameter(bus))
+    post_data_dictionary = get_parameter(bus)
+    post_data(post_data_dictionary)
 
 
 def setup(bus):
@@ -22,16 +22,26 @@ def setup(bus):
 
 
 def get_parameter(bus):
-    dig_humidity, dig_pressure, dig_temperature = get_calibration_parameter(bus)
-    pressure, temperature, humidity = read_data_from_bme280(bus, dig_humidity, dig_pressure, dig_temperature)
-    discomfort = 0.81 * temperature + 0.01 * humidity * (0.99 * temperature - 14.3) + 46.3
+    calibration_parameter = get_calibration_parameter(bus)
 
+    data_bme280 = read_data_from_bme280(bus, calibration_parameter)
+    discomfort = 0.81 * data_bme280['temperature'] + 0.01 * data_bme280['humidity'] * (0.99
+                                                                                       * data_bme280['temperature']
+                                                                                       - 14.3) + 46.3
     light = read_data_from_tsl2561(bus)
     ppm = read_data_from_mh_z19()
-    return discomfort, humidity, light, ppm, pressure, temperature
+
+    return {
+        'discomfort': discomfort,
+        'humidity': data_bme280['humidity'],
+        'light': light,
+        'ppm': ppm,
+        'pressure': data_bme280['pressure'],
+        'temperature': data_bme280['temperature']
+    }
 
 
-def post_data(discomfort, humidity, light, ppm, pressure, temperature):
+def post_data(post_data_dictionary):
     host_id = "3iFS5Ee4ueo"
     x_api_key = "jrknLvRqfcmn8JQ8LjVNWRgp8a3hRjVEo34rMx7Hs7Sr"
     now = int(time())
@@ -46,37 +56,37 @@ def post_data(discomfort, humidity, light, ppm, pressure, temperature):
             "hostId": host_id,
             "name": "custom.temperature.name",
             "time": now,
-            "value": temperature
+            "value": post_data_dictionary['temperature']
         },
         {
             "hostId": host_id,
             "name": "custom.humidity.name",
             "time": now,
-            "value": humidity
+            "value": post_data_dictionary['humidity']
         },
         {
             "hostId": host_id,
             "name": "custom.discomfort.name",
             "time": now,
-            "value": discomfort
+            "value": post_data_dictionary['discomfort']
         },
         {
             "hostId": host_id,
             "name": "custom.pressure.name",
             "time": now,
-            "value": pressure
+            "value": post_data_dictionary['pressure']
         },
         {
             "hostId": host_id,
             "name": "custom.light.name",
             "time": now,
-            "value": light
+            "value": post_data_dictionary['light']
         },
         {
             "hostId": host_id,
             "name": "custom.ppm.name",
             "time": now,
-            "value": ppm
+            "value": post_data_dictionary['ppm']
         },
     ]
 
