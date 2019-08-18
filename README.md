@@ -2,6 +2,10 @@
 
 Measure environmental values and record them on the monitoring server 
 
+## DEMO
+
+![demo](./demo.jpg)
+
 ## Requirement
 
 - Python 3
