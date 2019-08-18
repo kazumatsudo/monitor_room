@@ -23,7 +23,9 @@ Measure environmental values and record them on the monitoring server
     $ * * * * * for i in `seq 0 1 59`;do (sleep ${i}; python monitor_room/main.py) & done;
     ```
 
-## Instration
+## Install
+
+1. Make mackerel account
 
 1. Git clone
     ```
@@ -35,8 +37,6 @@ Measure environmental values and record them on the monitoring server
     $ export MONITOR_ROOM_MACKEREL_X_API_KEY="YOUR_MACKEREL_X_API_KEY"
     $ export MONITOR_ROOM_MACKEREL_HOST_ID="YOUR_MACKEREL_HOST_ID"
     ```
-
-1. Make mackerel account
 
 ## Before commit
 
