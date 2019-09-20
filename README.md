@@ -20,7 +20,7 @@ Measure environmental values and record them on the monitoring server
 - Run from cron
     ```
     // run every second
-    $ * * * * * for i in `seq 0 1 59`;do (sleep ${i}; python monitor_room/main.py) & done;
+    $ * * * * * for i in `seq 0 1 59`;do (sleep ${i}; python3 monitor_room/main.py) & done;
     ```
 
 ## Install
