@@ -28,5 +28,8 @@ class MhZ19(object):
         :return: float
             二酸化炭素濃度(ppm)
         """
-        result = self.serial.read(9)
-        return result[2] * 256 + result[3]
+        try:
+            result = self.serial.read(9)
+            return result[2] * 256 + result[3]
+        except IndexError:
+            return None
